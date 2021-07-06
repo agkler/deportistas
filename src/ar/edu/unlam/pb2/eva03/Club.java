@@ -6,25 +6,23 @@ import java.util.Map;
 import java.util.Set;
 
 import ar.edu.unlam.pb2.eva03.enumeradores.TipoDeEvento;
+import ar.edu.unlam.pb2.eva03.interfaces.ICiclista;
 import ar.edu.unlam.pb2.eva03.interfaces.ICorredor;
 import ar.edu.unlam.pb2.eva03.interfaces.INadador;
-
 
 public class Club {
 	private String nombre;
 	private Set<Deportista> socios;
 	private Map<String, Evento> competencias;
-	
+
 	public Club(String nombre) {
 		this.setNombre(nombre);
-		socios= new HashSet<>();
-		competencias= new HashMap<String, Evento>();
-		
+		socios = new HashSet<>();
+		competencias = new HashMap<String, Evento>();
 	}
 
 	public void agregarDeportista(Deportista nuevoDeportista) {
 		socios.add(nuevoDeportista);
-		
 	}
 
 	public String getNombre() {
@@ -41,42 +39,47 @@ public class Club {
 	}
 
 	public void crearEvento(TipoDeEvento tipoEvento, String nombre) {
-		Evento nuevoEvento= new Evento(tipoEvento, nombre);
+		Evento nuevoEvento = new Evento(tipoEvento, nombre);
 		competencias.put(nombre, nuevoEvento);
 	}
 
-	private Deportista getDeportista(Deportista nombreDeportista) {
-		// TODO Auto-generated method stub
-		for (Deportista actual : socios) {
-			if(actual.equals(nombreDeportista))
-				return actual;
-		}
-		return null;
-	}
-
 	private Evento getEvento(String nombreEvento) {
-		return competencias.get(nombreEvento);
+		return this.competencias.get(nombreEvento);
 	}
 
-	public Boolean inscribirEnEvento(String nombreEvento, Deportista nombre) throws NoEstaPreparado {
-		Evento nuevoEvento = getEvento(nombreEvento);
-		Deportista nuevoDeportista = getDeportista(nombre);
+	public Integer inscribirEnEvento(String nombreEvento, Deportista nombre) throws NoEstaPreparado {
+		Evento evento = getEvento(nombreEvento);
 
-		if (!(nuevoDeportista instanceof INadador)
-				&& nuevoEvento.getTipoEvento() == TipoDeEvento.CARRERA_NATACION_EN_AGUAS_ABIERTAS) {
-			throw new NoEstaPreparado();
+		switch (evento.getTipoEvento()) {
+		case CARRERA_10K:
+		case CARRERA_21K:
+		case CARRERA_42K:
+		case CARRERA_5K:
+			if (nombre instanceof ICorredor) {
+				return evento.agregarDeportistaAlEvento(nombre);
+			} else
+				throw new NoEstaPreparado();
+
+		case CARRERA_NATACION_EN_AGUAS_ABIERTAS:
+		case CARRERA_NATACION_EN_PICINA:
+			if (nombre instanceof INadador) {
+				return evento.agregarDeportistaAlEvento(nombre);
+			} else
+				throw new NoEstaPreparado();
+
+		case TRIATLON_IRONMAN:
+		case TRIATLON_MEDIO:
+		case TRIATLON_OLIMPICO:
+		case TRIATLON_SHORT:
+			if (nombre instanceof ICiclista && nombre instanceof ICorredor && nombre instanceof INadador) {
+				return evento.agregarDeportistaAlEvento(nombre);
+			} else
+				throw new NoEstaPreparado();
+		default:
+			break;
 		}
 
-		if (nuevoDeportista instanceof ICorredor && nuevoEvento.getTipoEvento() == TipoDeEvento.TRIATLON_IRONMAN) {
-			throw new NoEstaPreparado();
-		}
-
-		if (nuevoDeportista != null && nuevoEvento != null) {
-			return nuevoEvento.agregarDeportistaAlEvento(nuevoDeportista);
-		}
-		return false;
+		return 0;
 	}
-	
-	
-	
+
 }

@@ -18,6 +18,7 @@ public class Evento {
 		this.setTipoEvento(tipoEvento);
 		this.setNombre(nombre);
 		participantes= new HashMap<Integer, Deportista>();
+		this.numeroDeInscripcion=0;
 	}
 
 	public TipoDeEvento getTipoEvento() {
@@ -36,9 +37,10 @@ public class Evento {
 		this.nombre = nombre;
 	}
 
-	public Boolean agregarDeportistaAlEvento(Deportista nuevoDeportista) {
+	public Integer agregarDeportistaAlEvento(Deportista nuevoDeportista) {
+		numeroDeInscripcion++;
 		participantes.put(numeroDeInscripcion, nuevoDeportista);
-		return true;
+		return numeroDeInscripcion;
 		
 	}
 
